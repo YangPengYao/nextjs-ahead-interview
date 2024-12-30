@@ -25,7 +25,7 @@ export const getCSVData = async () => {
   // https://nextjs.org/docs/pages/api-reference/functions/get-static-props#reading-files-use-processcwd
   const csvFilePath = path.join(process.cwd(), "data", "CD45_pos_test.csv");
   const csvFile = await fs.promises.readFile(csvFilePath, "utf8");
-  const result = Papa.parse(csvFile, { header: true });
+  const result = Papa.parse(csvFile, { header: true, dynamicTyping: true });
   return result;
 };
 
