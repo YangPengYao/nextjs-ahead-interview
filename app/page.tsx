@@ -1,4 +1,4 @@
-import { getCSVData, get2DChartData } from "@/app/actions/get-csv-data";
+import { getCSVData, get2DChartData } from "@/app/get-csv-data";
 import { Button } from "@/components/ui/button";
 
 export default async function Home() {
