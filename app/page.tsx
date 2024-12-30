@@ -1,5 +1,5 @@
 import { getCSVData, get2DChartData } from "@/app/get-csv-data";
-import { Button } from "@/components/ui/button";
+import { ScatterPlot } from "@/components/chart/scatter-plot";
 
 export default async function Home() {
   const result = await getCSVData();
@@ -12,7 +12,14 @@ export default async function Home() {
 
   return (
     <div className="flex justify-center items-center h-screen">
-      <Button>Test</Button>
+      <ScatterPlot
+        title="Cell Distribution (CD45+)"
+        width={600}
+        height={600}
+        labelX={chartData.x}
+        labelY={chartData.y}
+        data={chartData.list}
+      />
     </div>
   );
 }

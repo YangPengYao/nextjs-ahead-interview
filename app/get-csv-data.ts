@@ -23,7 +23,7 @@ type HeaderCol =
 export const getCSVData = async () => {
   // Why use process.cwd()
   // https://nextjs.org/docs/pages/api-reference/functions/get-static-props#reading-files-use-processcwd
-  const csvFilePath = path.join(process.cwd(), "data", "CD45_pos_test.csv");
+  const csvFilePath = path.join(process.cwd(), "data", "CD45_pos.csv");
   const csvFile = await fs.promises.readFile(csvFilePath, "utf8");
   const result = Papa.parse(csvFile, { header: true, dynamicTyping: true });
   return result;
