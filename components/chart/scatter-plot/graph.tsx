@@ -2,7 +2,7 @@
 
 import React from "react";
 import * as d3 from "d3";
-import { TypographyH2, TypographyH3 } from "@/components/ui/typography";
+import { TypographyH3 } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 
 import type { Point, Polygon, PointsInsidePolygonStat } from "./types";
@@ -39,19 +39,31 @@ export const ScatterPlot = ({
   const innerHeight = height - margin.top - margin.bottom;
 
   // scale x
+  // ! Although the document says 'X軸顯示 CD45-KrO (200-1000)'
+  // ! There are some data points not between 200 and 1000
   const minX = d3.min(data, (d) => d.x) ?? 0;
   const maxX = d3.max(data, (d) => d.x) ?? 0;
+  const padX = (maxX - minX) * 0.05;
+  const paddedMinX = minX - padX;
+  const paddedMaxX = maxX + padX;
   const scaleX = React.useMemo(
-    () => d3.scaleLinear().domain([minX, maxX]).range([0, innerWidth]),
-    [minX, maxX, innerWidth]
+    () =>
+      d3.scaleLinear().domain([paddedMinX, paddedMaxX]).range([0, innerWidth]),
+    [innerWidth, paddedMaxX, paddedMinX]
   );
 
   // scale y
+  // ! Although the document says 'Y軸顯示 SS INT LIN (0-1000)'
+  // ! There are some data points not between 0 and 1000
   const minY = d3.min(data, (d) => d.y) ?? 0;
   const maxY = d3.max(data, (d) => d.y) ?? 0;
+  const padY = (maxY - minY) * 0.05;
+  const paddedMinY = minY - padY;
+  const paddedMaxY = maxY + padY;
   const scaleY = React.useMemo(
-    () => d3.scaleLinear().domain([minY, maxY]).range([innerHeight, 0]),
-    [minY, maxY, innerHeight]
+    () =>
+      d3.scaleLinear().domain([paddedMinY, paddedMaxY]).range([innerHeight, 0]),
+    [innerHeight, paddedMaxY, paddedMinY]
   );
 
   const drawCanvasAxes = React.useCallback(
@@ -65,10 +77,16 @@ export const ScatterPlot = ({
       const tickLength = 6;
       const spaceBetweenTextAndTick = 20;
 
+      // draw top border
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(innerWidth, 0);
+      ctx.stroke();
+
       // draw x axis
       ctx.beginPath();
-      ctx.moveTo(0, scaleY(minY));
-      ctx.lineTo(innerWidth, scaleY(minY));
+      ctx.moveTo(0, scaleY(paddedMinY));
+      ctx.lineTo(innerWidth, scaleY(paddedMinY));
       ctx.stroke();
 
       // draw x axis' ticks
@@ -76,20 +94,20 @@ export const ScatterPlot = ({
       const xTicks = scaleX.ticks(8);
       xTicks.forEach((d) => {
         ctx.beginPath();
-        ctx.moveTo(scaleX(d), scaleY(minY));
-        ctx.lineTo(scaleX(d), scaleY(minY) + tickLength);
+        ctx.moveTo(scaleX(d), scaleY(paddedMinY));
+        ctx.lineTo(scaleX(d), scaleY(paddedMinY) + tickLength);
         ctx.fillText(
           d.toString(),
           scaleX(d),
-          scaleY(minY) + spaceBetweenTextAndTick
+          scaleY(paddedMinY) + spaceBetweenTextAndTick
         );
         ctx.stroke();
       });
 
       // draw y axis
       ctx.beginPath();
-      ctx.moveTo(scaleX(minX), 0);
-      ctx.lineTo(scaleX(minX), innerHeight);
+      ctx.moveTo(scaleX(paddedMinX), 0);
+      ctx.lineTo(scaleX(paddedMinX), innerHeight);
       ctx.stroke();
 
       // draw y axis' ticks
@@ -97,17 +115,23 @@ export const ScatterPlot = ({
       const yTicks = scaleY.ticks(8);
       yTicks.forEach((d) => {
         ctx.beginPath();
-        ctx.moveTo(scaleX(minX), scaleY(d));
-        ctx.lineTo(scaleX(minX) - tickLength, scaleY(d));
+        ctx.moveTo(scaleX(paddedMinX), scaleY(d));
+        ctx.lineTo(scaleX(paddedMinX) - tickLength, scaleY(d));
         ctx.fillText(
           d.toString(),
-          scaleX(minX) - spaceBetweenTextAndTick,
+          scaleX(paddedMinX) - spaceBetweenTextAndTick,
           scaleY(d)
         );
         ctx.stroke();
       });
+
+      // draw right border
+      ctx.beginPath();
+      ctx.moveTo(innerWidth, 0);
+      ctx.lineTo(innerWidth, innerHeight);
+      ctx.stroke();
     },
-    [innerHeight, innerWidth, minX, minY, scaleY, scaleX]
+    [innerHeight, innerWidth, paddedMinX, paddedMinY, scaleY, scaleX]
   );
 
   const drawCanvasLabels = React.useCallback(
@@ -318,8 +342,11 @@ export const ScatterPlot = ({
 
   return (
     <div>
-      <div className="flex space-x-7">
-        <TypographyH2>{title}</TypographyH2>
+      <div
+        className="flex space-x-7 justify-center items-center"
+        style={{ width: `${width}px` }}
+      >
+        <TypographyH3>{title}</TypographyH3>
         <Button
           variant={isDrawing ? "secondary" : "default"}
           onClick={handlePolygonDraw}
