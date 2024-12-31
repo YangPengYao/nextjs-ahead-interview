@@ -2,11 +2,12 @@
 
 import React from "react";
 import * as d3 from "d3";
-import { TypographyH2 } from "@/components/ui/typography";
+import { TypographyH2, TypographyH3 } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 
 import type { Point, Polygon, PointsInsidePolygonStat } from "./types";
 import { generateRandomColor, calculatePointsInsidePolygonStat } from "./utils";
+import { Editor } from "./editor";
 
 interface ScatterPlotProps {
   title: string;
@@ -119,15 +120,10 @@ export const ScatterPlot = ({
       ctx.textBaseline = "bottom";
       ctx.fillText(labelX, innerWidth / 2, innerHeight + margin.top + 24);
 
-      // draw y label
-      // using ctx.save() and ctx.restore() to make sure the rotation only applies to this operation
-      // source: https://juejin.cn/post/6844903879599996942
-      ctx.save();
       ctx.rotate(-Math.PI / 2);
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(labelY, -innerHeight / 2, (margin.left - 20) * -1);
-      ctx.restore();
     },
     [innerHeight, innerWidth, labelX, labelY, margin.top, margin.left]
   );
@@ -217,11 +213,27 @@ export const ScatterPlot = ({
     // apply transformation matrix
     ctx.translate(margin.left, margin.top);
 
+    // using ctx.save() and ctx.restore() to make sure the rotation only applies to this operation
+    // source: https://juejin.cn/post/6844903879599996942
+    ctx.save();
     drawCanvasAxes(ctx);
+    ctx.restore();
+
+    ctx.save();
     drawCanvasLabels(ctx);
+    ctx.restore();
+
+    ctx.save();
     drawPoints(ctx);
+    ctx.restore();
+
+    ctx.save();
     drawCurrentPolygon(ctx);
+    ctx.restore();
+
+    ctx.save();
     drawCompletedPolygons(ctx);
+    ctx.restore();
 
     // reset transformation matrix
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -290,6 +302,20 @@ export const ScatterPlot = ({
     setPointsInsidePolygonStats(newPointsInsidePolygonStats);
   }, [polygons, data]);
 
+  const handlePolygonUpdate = React.useCallback((updatedPolygon: Polygon) => {
+    setPolygons((prevPolygons) =>
+      prevPolygons.map((polygon) =>
+        polygon.id === updatedPolygon.id ? updatedPolygon : polygon
+      )
+    );
+  }, []);
+
+  const handlePolygonDelete = React.useCallback((id: string) => {
+    setPolygons((prevPolygons) =>
+      prevPolygons.filter((polygon) => polygon.id !== id)
+    );
+  }, []);
+
   return (
     <div>
       <div className="flex space-x-7">
@@ -301,13 +327,26 @@ export const ScatterPlot = ({
           {isDrawing ? "Cancel Drawing" : "Arbitrary Polygon"}
         </Button>
       </div>
-      <div className="relative">
+      <div className="flex space-x-6">
         <canvas
           ref={canvasRef}
           width={width}
           height={height}
           onClick={handleCanvasClick}
         />
+        <div className="self-start w-64">
+          <TypographyH3>Polygon Group</TypographyH3>
+          <div className="space-y-6 max-h-[600px] overflow-y-auto mt-6">
+            {polygons.map((polygon) => (
+              <Editor
+                key={polygon.id}
+                polygon={polygon}
+                onUpdatePolygon={handlePolygonUpdate}
+                onDeletePolygon={handlePolygonDelete}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
