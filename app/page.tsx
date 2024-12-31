@@ -1,5 +1,5 @@
 import { getCSVData, get2DChartData } from "@/app/get-csv-data";
-import { ScatterPlot } from "@/components/chart/scatter-plot";
+import { ScatterPlot } from "@/components/chart/scatter-plot/graph";
 
 export default async function Home() {
   const result = await getCSVData();
