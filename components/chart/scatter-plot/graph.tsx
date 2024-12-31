@@ -334,9 +334,14 @@ export const ScatterPlot = ({
           height={height}
           onClick={handleCanvasClick}
         />
-        <div className="self-start w-64">
-          <TypographyH3>Polygon Group</TypographyH3>
-          <div className="space-y-6 max-h-[600px] overflow-y-auto mt-6">
+        <div
+          className="self-start w-64 overflow-y-auto"
+          style={{ maxHeight: `${height}px` }}
+        >
+          <TypographyH3 className="sticky top-0 bg-white">
+            Polygon Group
+          </TypographyH3>
+          <div className="space-y-6 mt-6">
             {polygons.map((polygon) => (
               <Editor
                 key={polygon.id}
