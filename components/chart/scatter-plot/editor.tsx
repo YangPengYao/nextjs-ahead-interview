@@ -54,7 +54,9 @@ export const Editor = ({
       <div className="space-y-2">
         <Label htmlFor="label">Label</Label>
         <Input id="label" value={polygon.label} onChange={handleLabelUpdate} />
+      </div>
 
+      <div className="space-y-2">
         <Label htmlFor="color">Color</Label>
         <Input
           id="color"
@@ -62,40 +64,40 @@ export const Editor = ({
           value={polygon.color}
           onChange={handleColorUpdate}
         />
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="style">Line Style</Label>
-          <Select value={polygon.style} onValueChange={handleStyleUpdate}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="solid">Solid</SelectItem>
-              <SelectItem value="dashed">Dashed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="style">Line Style</Label>
+        <Select value={polygon.style} onValueChange={handleStyleUpdate}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="solid">Solid</SelectItem>
+            <SelectItem value="dashed">Dashed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="lineWidth">Line Width</Label>
-          <Input
-            id="lineWidth"
-            type="number"
-            min="1"
-            max="6"
-            value={polygon.lineWidth}
-            onChange={handleLineWidthUpdate}
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="lineWidth">Line Width</Label>
+        <Input
+          id="lineWidth"
+          type="number"
+          min="1"
+          max="6"
+          value={polygon.lineWidth}
+          onChange={handleLineWidthUpdate}
+        />
+      </div>
 
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={handleDisplayTrigger}>
-            {polygon.isVisible ? "Hide" : "Show"}
-          </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Delete
-          </Button>
-        </div>
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={handleDisplayTrigger}>
+          {polygon.isVisible ? "Hide" : "Show"}
+        </Button>
+        <Button variant="destructive" onClick={handleDelete}>
+          Delete
+        </Button>
       </div>
     </div>
   );
