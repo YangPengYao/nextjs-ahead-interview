@@ -211,6 +211,8 @@ export const ScatterPlot = ({
 
         // draw label
         ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         ctx.fillStyle = polygon.color;
         const centerX = d3.mean(polygon.points, (d) => d.x) ?? 0;
         const centerY = d3.mean(polygon.points, (d) => d.y) ?? 0;
