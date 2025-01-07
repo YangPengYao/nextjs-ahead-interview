@@ -2,6 +2,9 @@ import type { Point, Polygon, PointsInsidePolygonStat } from "./types";
 
 export const generateRandomColor = (): string => {
   // 16777215 = 16^6 - 1 (000000 ~ FFFFFF)
+  // subtract 1 to make sure when the random number is like 0.9999999999999
+  // js will treat this like 1 and toString(16) will return '1000000'
+  // which is a overflow value
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 };
 
