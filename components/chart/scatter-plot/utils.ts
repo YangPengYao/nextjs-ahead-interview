@@ -2,6 +2,9 @@ import type { Point, Polygon, PointsInsidePolygonStat } from "./types";
 
 export const generateRandomColor = (): string => {
   // 16777215 = 16^6 - 1 (000000 ~ FFFFFF)
+  // subtract 1 to make sure when the random number is like 0.9999999999999
+  // js will treat this like 1 and toString(16) will return '1000000'
+  // which is a overflow value
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 };
 
@@ -25,13 +28,29 @@ export const checkIsPointInPolygon = (
     // ray-casting algorithm
     // y: need to check if y is between vs[i].y and vs[j].y
     // x: need to check if x is on the left side of the edge
+
+    // handle the situation when the the edge of the polygon is horizontal-like
+    if (Math.abs(vs[i].y - vs[j].y) < Number.EPSILON) {
+      // check if the point is on the edge
+      if (
+        vs[i].y === y &&
+        x >= Math.min(vs[i].x, vs[j].x) &&
+        x <= Math.max(vs[i].x, vs[j].x)
+      ) {
+        return true;
+      }
+      // not on the edge so skip
+      continue;
+    }
+
     const isIntersect =
       vs[i].y > y !== vs[j].y > y &&
-      // line equation: (y1 - y) / (y1 - y2) = (x1 - x) / (x1 - x2)
-      // x = (x2 - x1) * (y - y1) / (y2 - y1) + x1
+      // line equation: (y2 - y) / (x2 - x) = (y - y1) / (x - x1)
+      // x = (y - y1) * (x2 - x1) / (y2 - y1) + x1
       // but we only need to check if x is on the left side of the edge
       // so we can simplify the equation to:
       x < ((vs[j].x - vs[i].x) * (y - vs[i].y)) / (vs[j].y - vs[i].y) + vs[i].x;
+
     if (isIntersect) isInside = !isInside;
   }
 
